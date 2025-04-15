@@ -18,7 +18,7 @@ pipeline {
       
       stage('Push to registry') {
          steps {
-             withDockerRegistry([ credentialsId: "ID_облікових даних", url: "" ])
+             withDockerRegistry([ credentialsId: "dockerhub_token", url: "" ])
 {
 
                  sh "docker push romanmitpa2024/prikm:latest"
