@@ -27,15 +27,19 @@ pipeline {
 
       stage('Push artifact v1') {
          steps {
-            sh "docker tag prikm romanmitpa2024/prikm:v1"
-            sh "docker push romanmitpa2024/prikm:v1"
+            withDockerRegistry([ credentialsId: "dockerhub_token", url: "" ]) {
+               sh "docker tag prikm romanmitpa2024/prikm:v1"
+               sh "docker push romanmitpa2024/prikm:v1"
+            }
          }
       }
 
       stage('Push artifact v2') {
          steps {
-            sh "docker tag prikm romanmitpa2024/prikm:v2"
-            sh "docker push romanmitpa2024/prikm:v2"
+            withDockerRegistry([ credentialsId: "dockerhub_token", url: "" ]) {
+               sh "docker tag prikm romanmitpa2024/prikm:v2"
+               sh "docker push romanmitpa2024/prikm:v2"
+            }
          }
       }
 
@@ -46,4 +50,5 @@ pipeline {
       }
    }
 }
+
 
