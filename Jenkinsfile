@@ -49,6 +49,56 @@ pipeline {
          }
       }
    }
+
+    office365ConnectorWebhooks {
+        webhooks {
+            webhook {
+                name('Teams-O365')
+                url('Enter_your_URL_here')
+                startNotification(false)
+                notifySuccess(true)
+                notifyAborted(false)
+                notifyNotBuilt(false)
+                notifyUnstable(true)
+                notifyFailure(true)
+                notifyBackToNormal(true)
+                notifyRepeatedFailure(false)
+                timeout(30000)
+            }
+        }
+    }
+ 
+
+    parameters {
+        string(name: 'USERNAME', defaultValue: 'student', description: 'Enter your name')
+    }
+    stages {
+        stage('Hello') {
+            steps {
+                echo "Hello, ${params.USERNAME}!"
+            }
+        }
+    }
+   
+    stages {
+        stage('Greeting') {
+            steps {
+                echo "Hello, ${params.USERNAME}!"
+            }
+        }
+        stage('Write File') {
+            steps {
+                writeFile file: 'message.txt', text: "Welcome, ${params.USERNAME}"
+                echo 'File written.'
+            }
+        }
+        stage('Read File') {
+            steps {
+                def content = readFile 'message.txt'
+                echo "File contains: ${content}"
+            }
+        }
+    }
 }
 
 
