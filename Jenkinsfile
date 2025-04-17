@@ -5,26 +5,6 @@ pipeline {
         string(name: 'USERNAME', defaultValue: 'student', description: 'Enter your name')
     }
 
-    options {
-        office365ConnectorWebhooks {
-            webhooks {
-                webhook {
-                    name('Teams-O365')
-                    url('Enter_your_URL_here') // Введіть ваш URL вебхука
-                    startNotification(false)
-                    notifySuccess(true)
-                    notifyAborted(false)
-                    notifyNotBuilt(false)
-                    notifyUnstable(true)
-                    notifyFailure(true)
-                    notifyBackToNormal(true)
-                    notifyRepeatedFailure(false)
-                    timeout(30000)
-                }
-            }
-        }
-    }
-
     stages {
         stage('Start') {
             steps {
@@ -94,12 +74,37 @@ pipeline {
 
         stage('Read File') {
             steps {
-                def content = readFile 'message.txt'
-                echo "File contains: ${content}"
+                script {
+                    def content = readFile 'message.txt'
+                    echo "File contains: ${content}"
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            office365ConnectorWebhooks {
+                webhooks {
+                    webhook {
+                        name('Teams-O365')
+                        url('Enter_your_URL_here') // Введіть ваш URL вебхука
+                        startNotification(false)
+                        notifySuccess(true)
+                        notifyAborted(false)
+                        notifyNotBuilt(false)
+                        notifyUnstable(true)
+                        notifyFailure(true)
+                        notifyBackToNormal(true)
+                        notifyRepeatedFailure(false)
+                        timeout(30000)
+                    }
+                }
             }
         }
     }
 }
+
 
 
 
