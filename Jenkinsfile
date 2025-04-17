@@ -50,24 +50,23 @@ pipeline {
       }
    }
 
-    office365ConnectorWebhooks {
-        webhooks {
-            webhook {
-                name('Teams-O365')
-                url('Enter_your_URL_here')
-                startNotification(false)
-                notifySuccess(true)
-                notifyAborted(false)
-                notifyNotBuilt(false)
-                notifyUnstable(true)
-                notifyFailure(true)
-                notifyBackToNormal(true)
-                notifyRepeatedFailure(false)
-                timeout(30000)
-            }
-        }
-    }
- 
+    properties([
+        office365ConnectorWebhooks([
+            [
+                name: 'Teams-O365',
+                url: 'Enter_your_URL_here',
+                startNotification: false,
+                notifySuccess: true,
+                notifyAborted: false,
+                notifyNotBuilt: false,
+                notifyUnstable: true,
+                notifyFailure: true,
+                notifyBackToNormal: true,
+                notifyRepeatedFailure: false,
+                timeout: 30000
+            ]
+        ])
+    ])
 
     parameters {
         string(name: 'USERNAME', defaultValue: 'student', description: 'Enter your name')
