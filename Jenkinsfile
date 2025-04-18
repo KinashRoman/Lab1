@@ -86,9 +86,7 @@ pipeline {
                 script {
                     def message = "Build #${env.BUILD_NUMBER} finished for ${params.USERNAME}"
                     sh """
-                        curl -X POST -H "Content-type: application/json" \
-                        --data "{\\"text\\": \\"${message}\\"}" \
-                        https://hooks.slack.com/services/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
+                        curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' https://hooks.slack.com/services/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
                     """
                 }
             }
