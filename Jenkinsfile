@@ -16,7 +16,7 @@ pipeline {
             steps {
                 sh "docker build -t prikm:latest ."
                 sh "docker tag prikm romanmitpa2024/prikm:latest"
-                sh "docker tag prikm romanmitpa2024/prikm:$BUILD_NUMBER"
+                sh "docker tag prikm romanmitpa2024/prikm:${BUILD_NUMBER}"
             }
         }
 
@@ -24,7 +24,7 @@ pipeline {
             steps {
                 withDockerRegistry([credentialsId: "dockerhub_token", url: ""]) {
                     sh "docker push romanmitpa2024/prikm:latest"
-                    sh "docker push romanmitpa2024/prikm:$BUILD_NUMBER"
+                    sh "docker push romanmitpa2024/prikm:${BUILD_NUMBER}"
                 }
             }
         }
@@ -80,18 +80,22 @@ pipeline {
                 }
             }
         }
-    }
 
-    post {
-    always {
-        sh '''
-            curl -X POST -H "Content-type: application/json" \
-            --data "{\\"text\\": \\"Hello, World!\\"}" \
-            https://hooks.slack.com/services/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
-        '''
+        stage('Notify Slack') {
+            steps {
+                script {
+                    def message = "Build #${env.BUILD_NUMBER} finished for ${params.USERNAME}"
+                    sh """
+                        curl -X POST -H "Content-type: application/json" \
+                        --data "{\\"text\\": \\"${message}\\"}" \
+                        https://hooks.slack.com/services/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
+                    """
+                }
+            }
+        }
     }
 }
-}
+
 
 
 
