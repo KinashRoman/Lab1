@@ -83,20 +83,14 @@ pipeline {
     }
 
     post {
-        always {
-            script {
-                def payload = """
-                {
-                  "text": "Jenkins: Pipeline завершено для користувача *${params.USERNAME}*.\nСтатус: *${currentBuild.currentResult}*"
-                }
-                """
-                httpRequest httpMode: 'POST',
-                            contentType: 'APPLICATION_JSON',
-                            requestBody: payload,
-                            url: 'https://hooks.slack.com/services/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'
-            }
-        }
+    always {
+        sh '''
+            curl -X POST -H "Content-type: application/json" \
+            --data "{\\"text\\": \\"Hello, World!\\"}" \
+            https://hooks.slack.com/services/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
+        '''
     }
+}
 }
 
 
