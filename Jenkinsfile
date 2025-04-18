@@ -85,25 +85,24 @@ pipeline {
     post {
         success {
             office365ConnectorWebhooks {
-                webhooks {
-                    webhook {
-                        name('Teams-O365')
-                        url('Enter_your_URL_here') // Введіть ваш URL вебхука
-                        startNotification(false)
-                        notifySuccess(true)
-                        notifyAborted(false)
-                        notifyNotBuilt(false)
-                        notifyUnstable(true)
-                        notifyFailure(true)
-                        notifyBackToNormal(true)
-                        notifyRepeatedFailure(false)
-                        timeout(30000)
-                    }
+                webhook {
+                    name('Teams-O365')
+                    url('https://prod-25.westeurope.logic.azure.com:443/workflows/22d6d9e5e13f4f10a6eb0dbeeac14b0f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=brPprl_aD3YDY39h-vyqVz2q0OYTR_6fvxF6dgDh-XA') // Введіть ваш URL вебхука
+                    startNotification(false)
+                    notifySuccess(true)
+                    notifyAborted(false)
+                    notifyNotBuilt(false)
+                    notifyUnstable(true)
+                    notifyFailure(true)
+                    notifyBackToNormal(true)
+                    notifyRepeatedFailure(false)
+                    timeout(30000)
                 }
             }
         }
     }
 }
+
 
 
 
