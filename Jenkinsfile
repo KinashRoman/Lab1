@@ -83,16 +83,22 @@ pipeline {
     }
 
     post {
-    success {
-        office365ConnectorSend (
-            webhookUrl: 'https://prod-25.westeurope.logic.azure.com:443/workflows/22d6d9e5e13f4f10a6eb0dbeeac14b0f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=brPprl_aD3YDY39h-vyqVz2q0OYTR_6fvxF6dgDh-XA',
-            message: "Успішне виконання Jenkins pipeline для користувача ${params.USERNAME}",
-            status: 'Success'
-        )
+        always {
+            script {
+                def payload = """
+                {
+                  "text": "Jenkins: Pipeline завершено для користувача ${params.USERNAME}. Статус: ${currentBuild.currentResult}"
+                }
+                """
+                httpRequest httpMode: 'POST',
+                            contentType: 'APPLICATION_JSON',
+                            requestBody: payload,
+                            url: 'https://prod-25.westeurope.logic.azure.com:443/workflows/22d6d9e5e13f4f10a6eb0dbeeac14b0f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=brPprl_aD3YDY39h-vyqVz2q0OYTR_6fvxF6dgDh-XA'
+            }
+        }
     }
 }
 
-}
 
 
 
