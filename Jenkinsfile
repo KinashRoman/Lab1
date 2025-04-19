@@ -85,14 +85,19 @@ pipeline {
             steps {
                 script {
                     def message = "Build #${env.BUILD_NUMBER} finished for ${params.USERNAME}"
-                    sh """
-                        curl -X POST -H 'Content-type: application/json' --data '{"text":"Hello, World!"}' https://hooks.slack.com/services/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
-                    """
+                    
+                    withCredentials([string(credentialsId: 'slack_webhook_url', variable: 'SLACK_WEBHOOK_URL')]) {
+                        sh """
+                            curl -X POST -H 'Content-type: application/json' --data '{"text":"${message}"}' ${SLACK_WEBHOOK_URL}
+                        """
+                    }
                 }
             }
         }
     }
 }
+
+
 
 
 
