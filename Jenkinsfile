@@ -5,6 +5,13 @@ pipeline {
         string(name: 'USERNAME', defaultValue: 'student', description: 'Enter your name')
     }
 
+    environment {
+        DOCKER_IMAGE = 'prikm'
+        DOCKER_TAG_LATEST = 'latest'
+        DOCKER_REGISTRY = 'romanmitpa2024'
+        SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
+    }
+
     stages {
         stage('Start') {
             steps {
@@ -14,17 +21,23 @@ pipeline {
 
         stage('Image build') {
             steps {
-                sh "docker build -t prikm:latest ."
-                sh "docker tag prikm romanmitpa2024/prikm:latest"
-                sh "docker tag prikm romanmitpa2024/prikm:${BUILD_NUMBER}"
+                script {
+                    echo 'Building Docker image...'
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG_LATEST} ."
+                    sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG_LATEST} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG_LATEST}"
+                    sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG_LATEST} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                }
             }
         }
 
         stage('Push to registry') {
             steps {
                 withDockerRegistry([credentialsId: "dockerhub_token", url: ""]) {
-                    sh "docker push romanmitpa2024/prikm:latest"
-                    sh "docker push romanmitpa2024/prikm:${BUILD_NUMBER}"
+                    script {
+                        echo 'Pushing Docker image to registry...'
+                        sh "docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG_LATEST}"
+                        sh "docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${BUILD_NUMBER}"
+                    }
                 }
             }
         }
@@ -32,8 +45,11 @@ pipeline {
         stage('Push artifact v1') {
             steps {
                 withDockerRegistry([credentialsId: "dockerhub_token", url: ""]) {
-                    sh "docker tag prikm romanmitpa2024/prikm:v1"
-                    sh "docker push romanmitpa2024/prikm:v1"
+                    script {
+                        echo 'Pushing version v1 to registry...'
+                        sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG_LATEST} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:v1"
+                        sh "docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:v1"
+                    }
                 }
             }
         }
@@ -41,15 +57,21 @@ pipeline {
         stage('Push artifact v2') {
             steps {
                 withDockerRegistry([credentialsId: "dockerhub_token", url: ""]) {
-                    sh "docker tag prikm romanmitpa2024/prikm:v2"
-                    sh "docker push romanmitpa2024/prikm:v2"
+                    script {
+                        echo 'Pushing version v2 to registry...'
+                        sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG_LATEST} ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:v2"
+                        sh "docker push ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:v2"
+                    }
                 }
             }
         }
 
         stage('Deploy image') {
             steps {
-                sh "docker run -d -p 80:80 romanmitpa2024/prikm"
+                script {
+                    echo 'Deploying Docker image...'
+                    sh "docker run -d -p 80:80 ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${DOCKER_TAG_LATEST}"
+                }
             }
         }
 
@@ -67,8 +89,11 @@ pipeline {
 
         stage('Write File') {
             steps {
-                writeFile file: 'message.txt', text: "Welcome, ${params.USERNAME}"
-                echo 'File written.'
+                script {
+                    def message = "Welcome, ${params.USERNAME}"
+                    writeFile file: 'message.txt', text: message
+                    echo 'File written.'
+                }
             }
         }
 
@@ -85,12 +110,10 @@ pipeline {
             steps {
                 script {
                     def message = "Build #${env.BUILD_NUMBER} finished for ${params.USERNAME}"
-                    
-                    withCredentials([string(credentialsId: 'slack_webhook_url', variable: 'SLACK_WEBHOOK_URL')]) {
-                        sh """
-                            curl -X POST -H 'Content-type: application/json' --data '{"text":"${message}"}' ${SLACK_WEBHOOK_URL}
-                        """
-                    }
+                    echo "Notifying Slack..."
+                    sh """
+                        curl -X POST -H 'Content-type: application/json' --data '{"text":"${message}"}' ${SLACK_WEBHOOK_URL}
+                    """
                 }
             }
         }
