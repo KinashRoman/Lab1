@@ -107,7 +107,7 @@ pipeline {
 
         stage('Notify Slack') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub_token', variable: 'SLACK_WEBHOOK')]) {
+                withCredentials([string(credentialsId: 'slack-webhook-url', variable: 'SLACK_WEBHOOK')]) {
                     script {
                         def message = "Build #${env.BUILD_NUMBER} завершено для *${params.USERNAME}*"
                         echo "Notifying Slack..."
