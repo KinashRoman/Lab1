@@ -98,7 +98,7 @@ pipeline {
         stage('Slack Notify User Info') {
             steps {
                 script {
-                    slackNotify("Користувач: ${params.USERNAME}\n Вік: ${params.AGE}")
+                    slackNotify("User: ${params.USERNAME}\nAge: ${params.AGE}")
                 }
             }
         }
