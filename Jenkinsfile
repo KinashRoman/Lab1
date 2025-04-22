@@ -9,7 +9,6 @@ pipeline {
         DOCKER_IMAGE = 'prikm'
         DOCKER_TAG_LATEST = 'latest'
         DOCKER_REGISTRY = 'romanmitpa2024'
-        SLACK_WEBHOOK_URL = 'https://hooks.slack.com/services/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'
     }
 
     stages {
@@ -108,17 +107,22 @@ pipeline {
 
         stage('Notify Slack') {
             steps {
-                script {
-                    def message = "Build #${env.BUILD_NUMBER} finished for ${params.USERNAME}"
-                    echo "Notifying Slack..."
-                    sh """
-                        curl -X POST -H 'Content-type: application/json' --data '{"text":"${message}"}' ${SLACK_WEBHOOK_URL}
-                    """
+                withCredentials([string(credentialsId: 'slack_webhook_url', variable: 'SLACK_WEBHOOK')]) {
+                    script {
+                        def message = "Build #${env.BUILD_NUMBER} завершено для *${params.USERNAME}*"
+                        echo "Notifying Slack..."
+                        sh """
+                            curl -X POST -H 'Content-type: application/json' \
+                            --data '{"text": "${message}"}' \
+                            $SLACK_WEBHOOK
+                        """
+                    }
                 }
             }
         }
     }
 }
+
 
 
 
